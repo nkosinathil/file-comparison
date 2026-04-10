@@ -1,0 +1,41 @@
+[Unit]
+Description=Aurex Celery Worker
+After=network.target redis.service
+Wants=redis.service
+
+[Service]
+Type=forking
+User=aurex
+Group=aurex
+WorkingDirectory=/opt/aurex/python-backend
+Environment="PATH=/opt/aurex/python-backend/venv/bin"
+EnvironmentFile=/opt/aurex/python-backend/.env
+
+# Start Celery worker
+ExecStart=/opt/aurex/python-backend/venv/bin/celery -A app.tasks worker \
+    --loglevel=${LOG_LEVEL:-INFO} \
+    --concurrency=${CELERY_WORKER_CONCURRENCY:-4} \
+    --prefetch-multiplier=${CELERY_WORKER_PREFETCH_MULTIPLIER:-1} \
+    --pidfile=/var/run/aurex/celery-worker.pid \
+    --logfile=/var/log/aurex/celery-worker.log
+
+# PID file
+PIDFile=/var/run/aurex/celery-worker.pid
+
+# Restart policy
+Restart=always
+RestartSec=10
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=60
+
+# Resource limits
+LimitNOFILE=65536
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=aurex-celery-worker
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,38 @@
+[Unit]
+Description=Aurex FastAPI Application
+After=network.target postgresql.service redis.service
+Wants=postgresql.service redis.service
+
+[Service]
+Type=simple
+User=aurex
+Group=aurex
+WorkingDirectory=/opt/aurex/python-backend
+Environment="PATH=/opt/aurex/python-backend/venv/bin"
+EnvironmentFile=/opt/aurex/python-backend/.env
+
+# Start FastAPI with Uvicorn
+ExecStart=/opt/aurex/python-backend/venv/bin/uvicorn \
+    app.main:app \
+    --host ${API_HOST:-0.0.0.0} \
+    --port ${API_PORT:-8001} \
+    --workers ${API_WORKERS:-4} \
+    --log-level ${LOG_LEVEL:-info}
+
+# Restart policy
+Restart=always
+RestartSec=10
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+# Resource limits
+LimitNOFILE=65536
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=aurex-api
+
+[Install]
+WantedBy=multi-user.target

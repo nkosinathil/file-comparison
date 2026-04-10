@@ -1,0 +1,33 @@
+[Unit]
+Description=Aurex Celery Beat Scheduler
+After=network.target redis.service
+Wants=redis.service
+
+[Service]
+Type=simple
+User=aurex
+Group=aurex
+WorkingDirectory=/opt/aurex/python-backend
+Environment="PATH=/opt/aurex/python-backend/venv/bin"
+EnvironmentFile=/opt/aurex/python-backend/.env
+
+# Start Celery beat (for scheduled tasks)
+ExecStart=/opt/aurex/python-backend/venv/bin/celery -A app.tasks beat \
+    --loglevel=${LOG_LEVEL:-INFO} \
+    --pidfile=/var/run/aurex/celery-beat.pid \
+    --logfile=/var/log/aurex/celery-beat.log
+
+# PID file
+PIDFile=/var/run/aurex/celery-beat.pid
+
+# Restart policy
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=aurex-celery-beat
+
+[Install]
+WantedBy=multi-user.target
