@@ -1,0 +1,17 @@
+{
+  "case_id": "CASE001_20260324_161113",
+  "case_name": "CASE001",
+  "evidence_number": "EV001",
+  "case_description": "Description",
+  "timezone": "Africa/Johannesburg (GMT+2)",
+  "input_folder": "C:/Users/info/OneDrive/Documents/fnb_analyzer/Bank",
+  "output_folder": "C:/Users/info/OneDrive/Documents/aurex_bank_analyzer/out",
+  "db_path": "C:\\Users\\info\\OneDrive\\Documents\\aurex_bank_analyzer\\aurex_bank_analyzer\\cases\\CASE001_20260324_161113\\fnb_statements.db",
+  "status": "completed",
+  "created_at": "2026-03-24 16:11:13",
+  "updated_at": "2026-03-24 16:11:52",
+  "total_files": 12,
+  "processed_files": 12,
+  "total_transactions": 347,
+  "date_range": "2024-03-22 to 2025-03-20"
+}

@@ -1,0 +1,6 @@
+PySide6
+pdfplumber
+pdf2image
+pytesseract
+requests
+pandas
