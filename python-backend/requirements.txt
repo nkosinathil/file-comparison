@@ -24,7 +24,7 @@ minio==7.2.0
 pdfplumber==0.10.3
 pdf2image==1.16.3
 pytesseract==0.3.10
-Pillow==10.3.0  # Updated from 10.1.0 - fixes buffer overflow vulnerability
+Pillow==12.1.1  # Updated from 10.3.0 - fixes out-of-bounds write vulnerability in PSD loading
 
 # Data Processing
 pandas==2.1.3

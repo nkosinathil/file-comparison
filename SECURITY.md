@@ -16,7 +16,7 @@ We will acknowledge receipt within 48 hours and provide a timeline for resolutio
 
 ## Security Updates
 
-### 2026-04-10: Dependency Security Patches
+### 2026-04-10: Dependency Security Patches (Updated)
 
 **Status**: ✅ FIXED
 
@@ -30,13 +30,14 @@ We will acknowledge receipt within 48 hours and provide a timeline for resolutio
    - **Impact**: Content-Type header Regular Expression Denial of Service (ReDoS)
    - **Resolution**: Updated from 0.104.1 to 0.110.0
 
-2. **Pillow Buffer Overflow**
+2. **Pillow Out-of-Bounds Write in PSD Loading**
    - **Package**: Pillow
-   - **Affected Version**: < 10.3.0
-   - **Fixed Version**: 10.3.0
-   - **Severity**: High
-   - **Impact**: Buffer overflow vulnerability in image processing
-   - **Resolution**: Updated from 10.1.0 to 10.3.0
+   - **Affected Version**: ≥ 10.3.0, < 12.1.1
+   - **Fixed Version**: 12.1.1
+   - **Severity**: Critical
+   - **Impact**: Out-of-bounds write vulnerability when loading PSD (Photoshop) images
+   - **Resolution**: Updated from 10.3.0 to 12.1.1
+   - **Note**: Also fixes previous buffer overflow vulnerability from version 10.1.0
 
 3. **python-jose Algorithm Confusion**
    - **Package**: python-jose
@@ -86,7 +87,7 @@ pip list | grep -E "fastapi|Pillow|python-jose|python-multipart"
 Expected output:
 ```
 fastapi                   0.110.0
-Pillow                    10.3.0
+Pillow                    12.1.1
 python-jose               3.4.0
 python-multipart          0.0.22
 ```
