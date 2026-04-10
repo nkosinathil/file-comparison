@@ -64,9 +64,9 @@ sudo ./deploy.sh
 ### 4. Access the Application
 - **Web Interface**: http://localhost
 - **API Documentation**: http://localhost:8000/docs
-- **Default Credentials**: 
+- **Initial Admin Credentials**: 
   - Username: `admin`
-  - Password: `admin123`
+  - Password: Check `initial_admin_password.txt` file or API server logs
   - ⚠️ **Change immediately after first login!**
 
 ## 📁 Project Structure

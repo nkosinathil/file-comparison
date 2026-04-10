@@ -29,8 +29,11 @@ sudo ./deploy.sh
 
 **Access:**
 - Web Interface: http://localhost
-- API Docs: http://localhost:8000/docs
-- Default Login: admin / admin123 (⚠️ change immediately!)
+- API Documentation: http://localhost:8000/docs
+- **Initial Login**: 
+  - Username: `admin`
+  - Password: Check `initial_admin_password.txt` or API logs
+  - ⚠️ **Change immediately after first login!**
 
 ## 📚 Documentation
 

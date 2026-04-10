@@ -80,14 +80,21 @@ class AuthManager:
                 full_name="System Administrator",
                 role="admin"
             )
-            # Log the password securely (only on first creation)
+            # Log password information securely
             logger.warning("=" * 60)
             logger.warning("IMPORTANT: Default admin user created")
-            logger.warning(f"Username: admin")
-            logger.warning(f"Password: {initial_password}")
-            logger.warning("SAVE THIS PASSWORD - It will not be shown again!")
+            logger.warning("Username: admin")
+            logger.warning("Check secure logs for initial password")
             logger.warning("Change password immediately after first login")
             logger.warning("=" * 60)
+            
+            # Write password to secure file (not in logs)
+            password_file = Path("initial_admin_password.txt")
+            with open(password_file, "w") as f:
+                f.write(f"Initial Admin Password: {initial_password}\n")
+                f.write("Delete this file after saving the password!\n")
+            os.chmod(password_file, 0o600)  # Read/write for owner only
+            logger.info(f"Initial password written to {password_file.absolute()}")
     
     def load_users(self):
         """Load users from JSON file"""

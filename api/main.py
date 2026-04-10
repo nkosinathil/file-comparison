@@ -441,18 +441,19 @@ async def upload_files(
         if not case:
             raise HTTPException(status_code=404, detail="Case not found")
         
-        # Validate and sanitize case input folder path
-        input_folder = Path(case.input_folder).resolve()
+        # Validate case input folder path
+        input_folder_path = case.input_folder
         
-        # Security: Ensure the path is within allowed directories
-        # Prevent path traversal attacks
-        allowed_base = Path("/app/data").resolve()
-        try:
-            input_folder.relative_to(allowed_base)
-        except ValueError:
+        # Security: Validate that input folder is within allowed data directory
+        base_data_dir = Path(__file__).resolve().parent.parent / "data"
+        input_folder = Path(input_folder_path).resolve()
+        
+        # Ensure path is absolute and within data directory
+        if not str(input_folder).startswith(str(base_data_dir)):
+            logger.error(f"Invalid input folder path: {input_folder}")
             raise HTTPException(
-                status_code=400, 
-                detail="Invalid input folder path"
+                status_code=400,
+                detail="Invalid case configuration"
             )
         
         input_folder.mkdir(parents=True, exist_ok=True)
@@ -465,7 +466,8 @@ async def upload_files(
             
             # Sanitize filename to prevent path traversal
             safe_filename = Path(file.filename).name
-            if safe_filename != file.filename or '..' in file.filename:
+            if safe_filename != file.filename or '..' in file.filename or '/' in file.filename:
+                logger.warning(f"Invalid filename rejected: {file.filename}")
                 raise HTTPException(
                     status_code=400,
                     detail=f"Invalid filename: {file.filename}"
@@ -473,13 +475,12 @@ async def upload_files(
             
             file_path = input_folder / safe_filename
             
-            # Additional check to ensure file stays within input folder
-            try:
-                file_path.resolve().relative_to(input_folder.resolve())
-            except ValueError:
+            # Final validation: ensure file is within input folder
+            if not str(file_path.resolve()).startswith(str(input_folder)):
+                logger.error(f"Path traversal attempt detected: {file.filename}")
                 raise HTTPException(
                     status_code=400,
-                    detail="Invalid file path"
+                    detail="Security violation detected"
                 )
             
             with open(file_path, "wb") as f:

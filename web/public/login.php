@@ -140,9 +140,13 @@ $pageTitle = 'Login';
                         
                         <div class="mt-4 text-center">
                             <small class="text-muted">
-                                Default credentials: <strong>admin</strong> / <strong>admin123</strong>
+                                <strong>First Time Setup:</strong>
                                 <br>
-                                <em>(Change password after first login)</em>
+                                Check API server logs or <code>initial_admin_password.txt</code> file
+                                <br>
+                                for your randomly generated admin password.
+                                <br>
+                                <em>Change password immediately after login</em>
                             </small>
                         </div>
                     </div>

@@ -34,11 +34,20 @@ Open your browser and navigate to:
 - **API Documentation**: http://localhost:8000/docs
 
 ### Step 4: Login
-Use the default credentials:
-- **Username**: admin
-- **Password**: admin123
+Get your admin credentials:
+```bash
+# Check the password file (created on first run)
+cat initial_admin_password.txt
 
-⚠️ **Important**: Change the default password immediately!
+# Or check API logs
+docker-compose logs api | grep "Initial password"
+```
+
+Use these credentials to login:
+- **Username**: admin
+- **Password**: [from file or logs]
+
+⚠️ **Important**: Change the password immediately after first login!
 
 ## 📋 What's Next?
 
