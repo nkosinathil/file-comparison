@@ -441,7 +441,20 @@ async def upload_files(
         if not case:
             raise HTTPException(status_code=404, detail="Case not found")
         
-        input_folder = Path(case.input_folder)
+        # Validate and sanitize case input folder path
+        input_folder = Path(case.input_folder).resolve()
+        
+        # Security: Ensure the path is within allowed directories
+        # Prevent path traversal attacks
+        allowed_base = Path("/app/data").resolve()
+        try:
+            input_folder.relative_to(allowed_base)
+        except ValueError:
+            raise HTTPException(
+                status_code=400, 
+                detail="Invalid input folder path"
+            )
+        
         input_folder.mkdir(parents=True, exist_ok=True)
         
         uploaded_files = []
@@ -450,13 +463,31 @@ async def upload_files(
                 logger.warning(f"Skipping non-PDF file: {file.filename}")
                 continue
             
-            file_path = input_folder / file.filename
+            # Sanitize filename to prevent path traversal
+            safe_filename = Path(file.filename).name
+            if safe_filename != file.filename or '..' in file.filename:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid filename: {file.filename}"
+                )
+            
+            file_path = input_folder / safe_filename
+            
+            # Additional check to ensure file stays within input folder
+            try:
+                file_path.resolve().relative_to(input_folder.resolve())
+            except ValueError:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Invalid file path"
+                )
+            
             with open(file_path, "wb") as f:
                 content = await file.read()
                 f.write(content)
             
-            uploaded_files.append(file.filename)
-            logger.info(f"File {file.filename} uploaded to case {case_id}")
+            uploaded_files.append(safe_filename)
+            logger.info(f"File {safe_filename} uploaded to case {case_id}")
         
         return {
             "message": f"Uploaded {len(uploaded_files)} files",

@@ -4,10 +4,11 @@
  * Configuration File
  */
 
-// Error Reporting (disable in production)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// Error Reporting (controlled by environment)
+$displayErrors = getenv('PHP_DISPLAY_ERRORS') === 'true' ? 1 : 0;
+ini_set('display_errors', $displayErrors);
+ini_set('display_startup_errors', $displayErrors);
+error_reporting($displayErrors ? E_ALL : 0);
 
 // Application Settings
 define('APP_NAME', 'Aurex - Bank Statement Intelligence');

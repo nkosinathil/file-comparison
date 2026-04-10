@@ -19,7 +19,9 @@ from passlib.context import CryptContext
 logger = logging.getLogger(__name__)
 
 # JWT Configuration
-SECRET_KEY = secrets.token_urlsafe(32)  # In production, load from environment
+SECRET_KEY = os.getenv("JWT_SECRET_KEY") or secrets.token_urlsafe(32)  # Load from environment
+if not os.getenv("JWT_SECRET_KEY"):
+    logger.warning("JWT_SECRET_KEY not set in environment. Using random key (tokens will not persist across restarts)")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 480  # 8 hours
 
@@ -69,14 +71,23 @@ class AuthManager:
         
         # Create default admin user if no users exist
         if not self.users_db:
+            # Generate random initial password
+            initial_password = secrets.token_urlsafe(16)
             self.create_user(
                 username="admin",
                 email="admin@aurex.local",
-                password="admin123",  # Change in production!
+                password=initial_password,
                 full_name="System Administrator",
                 role="admin"
             )
-            logger.warning("Created default admin user with password 'admin123'. CHANGE THIS IN PRODUCTION!")
+            # Log the password securely (only on first creation)
+            logger.warning("=" * 60)
+            logger.warning("IMPORTANT: Default admin user created")
+            logger.warning(f"Username: admin")
+            logger.warning(f"Password: {initial_password}")
+            logger.warning("SAVE THIS PASSWORD - It will not be shown again!")
+            logger.warning("Change password immediately after first login")
+            logger.warning("=" * 60)
     
     def load_users(self):
         """Load users from JSON file"""
