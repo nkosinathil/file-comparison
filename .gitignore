@@ -48,6 +48,7 @@ uploads/
 *.sqlite
 *.sqlite3
 users.json
+initial_admin_password.txt
 
 # Docker
 .dockerignore
