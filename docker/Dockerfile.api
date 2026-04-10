@@ -1,0 +1,47 @@
+# Dockerfile for Python API Server
+
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    tesseract-ocr \
+    poppler-utils \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt /app/
+
+# Create extended requirements for API
+RUN echo "fastapi>=0.104.0" >> /app/requirements.txt && \
+    echo "uvicorn[standard]>=0.24.0" >> /app/requirements.txt && \
+    echo "python-multipart>=0.0.6" >> /app/requirements.txt && \
+    echo "python-jose[cryptography]>=3.3.0" >> /app/requirements.txt && \
+    echo "passlib[bcrypt]>=1.7.4" >> /app/requirements.txt && \
+    echo "websockets>=12.0" >> /app/requirements.txt
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY aurex_bank_analyzer /app/aurex_bank_analyzer
+COPY api /app/api
+COPY *.py /app/
+
+# Create necessary directories
+RUN mkdir -p /app/data /app/logs
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/api/health || exit 1
+
+# Run the API server
+CMD ["python", "-m", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
