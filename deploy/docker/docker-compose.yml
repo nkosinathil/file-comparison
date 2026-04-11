@@ -1,0 +1,104 @@
+# Aurex Docker Compose Configuration
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: aurex-postgres
+    environment:
+      POSTGRES_DB: aurex
+      POSTGRES_USER: aurex
+      POSTGRES_PASSWORD: ${DB_PASS}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../../database/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - aurex-network
+    restart: unless-stopped
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: aurex-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - aurex-network
+    restart: unless-stopped
+
+  # Python Backend API
+  backend:
+    build:
+      context: ../../python-backend
+      dockerfile: Dockerfile
+    container_name: aurex-backend
+    environment:
+      DATABASE_URL: postgresql://aurex:${DB_PASS}@postgres:5432/aurex
+      REDIS_URL: redis://redis:6379/0
+      PYTHON_API_KEY: ${PYTHON_API_KEY}
+    volumes:
+      - aurex_uploads:/var/aurex/uploads
+      - aurex_cases:/var/aurex/cases
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - aurex-network
+    restart: unless-stopped
+
+  # Celery Worker
+  worker:
+    build:
+      context: ../../python-backend
+      dockerfile: Dockerfile
+    container_name: aurex-worker
+    command: celery -A app.celery worker --loglevel=info --concurrency=4
+    environment:
+      DATABASE_URL: postgresql://aurex:${DB_PASS}@postgres:5432/aurex
+      REDIS_URL: redis://redis:6379/0
+      PYTHON_API_KEY: ${PYTHON_API_KEY}
+    volumes:
+      - aurex_uploads:/var/aurex/uploads
+      - aurex_cases:/var/aurex/cases
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - aurex-network
+    restart: unless-stopped
+
+  # PHP Frontend (Apache)
+  frontend:
+    build:
+      context: ../../php-app
+      dockerfile: Dockerfile
+    container_name: aurex-frontend
+    environment:
+      PYTHON_API_URL: http://backend:8000
+      PYTHON_API_KEY: ${PYTHON_API_KEY}
+    volumes:
+      - ../../php-app:/var/www/html
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - aurex-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  aurex_uploads:
+  aurex_cases:
+
+networks:
+  aurex-network:
+    driver: bridge
