@@ -3,7 +3,7 @@ Description=Aurex Python Backend API
 After=network.target postgresql.service redis.service
 
 [Service]
-Type=notify
+Type=simple
 User=aurex
 Group=aurex
 WorkingDirectory=/var/www/aurex/python-backend

@@ -2,7 +2,7 @@
 Processing Router - Handle PDF processing and job management
 """
 
-from datetime import datetime, timezone
+from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from sqlalchemy.orm import Session
@@ -27,7 +27,7 @@ async def start_processing(
         raise HTTPException(status_code=409, detail=f"Case already {case.status}")
 
     case.status = "queued"
-    case.updated_at = datetime.now(timezone.utc)
+    case.updated_at = datetime.utcnow()
     db.commit()
 
     # Placeholder hook for worker-based processing implementation.
@@ -75,7 +75,7 @@ async def cancel_processing(case_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=409, detail="Completed case cannot be cancelled")
 
     case.status = "cancelled"
-    case.updated_at = datetime.now(timezone.utc)
+    case.updated_at = datetime.utcnow()
     db.commit()
     return {
         "case_id": case_id,

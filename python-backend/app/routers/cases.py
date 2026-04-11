@@ -2,7 +2,7 @@
 Cases Router - Handle case CRUD operations
 """
 
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import List
 from uuid import uuid4
 
@@ -39,7 +39,7 @@ async def list_cases(
 @router.post("/", response_model=CaseResponse, status_code=201)
 async def create_case(case: CaseCreate, db: Session = Depends(get_db)):
     """Create a new case"""
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
     case_id = f"CASE_{now.strftime('%Y%m%d_%H%M%S')}_{uuid4().hex[:8].upper()}"
     db_case = Case(
         id=case_id,
