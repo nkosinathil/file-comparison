@@ -18,12 +18,17 @@ class ChatController extends BaseController
             $this->json(['error' => 'Question is required'], 400);
             return;
         }
-        
-        // TODO: Forward to Python backend AI chat service
-        $this->json([
-            'case_id' => $id,
-            'question' => $question,
-            'answer' => 'AI response placeholder'
-        ]);
+
+        $response = $this->pythonApiRequest(
+            'POST',
+            '/api/chat/' . urlencode($id) . '/ask',
+            ['question' => $question]
+        );
+        if (!$response['ok']) {
+            $this->json(['error' => $response['error']], $response['status']);
+            return;
+        }
+
+        $this->json($response['data']);
     }
 }

@@ -16,9 +16,6 @@ COPY . /var/www/html/
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html
 
-# Copy Apache configuration
-COPY ../deploy/apache/aurex.conf /etc/apache2/sites-available/000-default.conf
-
 # Expose port
 EXPOSE 80
 

@@ -3,7 +3,7 @@ Description=Aurex Celery Worker for Background Processing
 After=network.target postgresql.service redis.service
 
 [Service]
-Type=forking
+Type=simple
 User=aurex
 Group=aurex
 WorkingDirectory=/var/www/aurex/python-backend

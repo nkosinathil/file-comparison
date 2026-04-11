@@ -2,12 +2,33 @@
 Database models using SQLAlchemy
 """
 
-from sqlalchemy import Column, Integer, String, DateTime, JSON, Text, Float, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, DateTime, Text, Float, ForeignKey, create_engine
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from datetime import datetime
+from ..config import settings
 
 Base = declarative_base()
+
+engine = create_engine(
+    settings.database_url,
+    pool_pre_ping=True,
+    future=True,
+)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
+
+
+def init_db() -> None:
+    """Initialize database schema when services start."""
+    Base.metadata.create_all(bind=engine)
+
+
+def get_db():
+    """Yield DB session for request handlers."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 class Case(Base):

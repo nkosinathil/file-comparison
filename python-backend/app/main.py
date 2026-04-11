@@ -10,6 +10,7 @@ from contextlib import asynccontextmanager
 import logging
 from typing import Optional
 
+from .models.database import init_db
 from .routers import cases, analysis, chat, processing
 from .config import settings
 
@@ -34,7 +35,7 @@ async def verify_api_key(api_key: str = Security(api_key_header)) -> str:
 async def lifespan(app: FastAPI):
     """Startup and shutdown events"""
     logger.info("Starting Aurex Python Backend...")
-    # Initialize services here
+    init_db()
     yield
     logger.info("Shutting down Aurex Python Backend...")
 

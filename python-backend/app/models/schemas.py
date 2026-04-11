@@ -3,7 +3,7 @@ Pydantic schemas for API request/response validation
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 from datetime import datetime
 
 
@@ -64,7 +64,7 @@ class AnalysisInsights(BaseModel):
     date_range: Dict[str, str]
     categories: Dict[str, float]
     monthly_trend: Dict[str, float]
-    top_counterparties: List[Dict[str, any]]
+    top_counterparties: List[Dict[str, Any]]
 
 
 class NetworkNode(BaseModel):

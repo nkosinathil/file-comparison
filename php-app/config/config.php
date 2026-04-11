@@ -12,8 +12,18 @@ if (file_exists(__DIR__ . '/../../.env')) {
         if (strpos(trim($line), '#') === 0) {
             continue;
         }
+        if (strpos($line, '=') === false) {
+            continue;
+        }
         list($name, $value) = explode('=', $line, 2);
-        $_ENV[trim($name)] = trim($value);
+        $value = trim($value);
+        if (
+            (str_starts_with($value, '"') && str_ends_with($value, '"')) ||
+            (str_starts_with($value, "'") && str_ends_with($value, "'"))
+        ) {
+            $value = substr($value, 1, -1);
+        }
+        $_ENV[trim($name)] = $value;
     }
 }
 

@@ -34,14 +34,14 @@ services:
   # Python Backend API
   backend:
     build:
-      context: ./python-backend
+      context: ../../python-backend
       dockerfile: Dockerfile
     container_name: aurex-backend
     environment:
       DATABASE_URL: postgresql://aurex:${DB_PASS}@postgres:5432/aurex
       REDIS_URL: redis://redis:6379/0
+      PYTHON_API_KEY: ${PYTHON_API_KEY}
     volumes:
-      - ./python-backend:/app
       - aurex_uploads:/var/aurex/uploads
       - aurex_cases:/var/aurex/cases
     ports:
@@ -56,15 +56,15 @@ services:
   # Celery Worker
   worker:
     build:
-      context: ./python-backend
+      context: ../../python-backend
       dockerfile: Dockerfile
     container_name: aurex-worker
     command: celery -A app.celery worker --loglevel=info --concurrency=4
     environment:
       DATABASE_URL: postgresql://aurex:${DB_PASS}@postgres:5432/aurex
       REDIS_URL: redis://redis:6379/0
+      PYTHON_API_KEY: ${PYTHON_API_KEY}
     volumes:
-      - ./python-backend:/app
       - aurex_uploads:/var/aurex/uploads
       - aurex_cases:/var/aurex/cases
     depends_on:
@@ -77,13 +77,14 @@ services:
   # PHP Frontend (Apache)
   frontend:
     build:
-      context: ./php-app
+      context: ../../php-app
       dockerfile: Dockerfile
     container_name: aurex-frontend
     environment:
       PYTHON_API_URL: http://backend:8000
+      PYTHON_API_KEY: ${PYTHON_API_KEY}
     volumes:
-      - ./php-app:/var/www/html
+      - ../../php-app:/var/www/html
     ports:
       - "80:80"
     depends_on:
